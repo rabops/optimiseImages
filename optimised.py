@@ -1,9 +1,17 @@
 import os
 import shutil
+import tkinter as tk
+from tkinter import filedialog
 from PIL import Image
 
-# Define the root directory
-root_folder = '/Users/rabsun/Desktop/vj'  # Replace with your actual path
+# Open a file dialog to select the root folder
+root = tk.Tk()
+root.withdraw()  # Hide the root window
+
+root_folder = filedialog.askdirectory(title="Select Folder Containing Images")
+if not root_folder:
+    print("No folder selected. Exiting...")
+    exit()
 
 # Track processed files
 processed_count = 0
@@ -13,7 +21,7 @@ for dirpath, _, filenames in os.walk(root_folder):
     image_found = False  # Flag to check if any images are in the directory
     
     for filename in filenames:
-        if filename.lower().endswith(('.jpg', '.jpeg', '.png')):
+        if filename.lower().endswith((".jpg", ".jpeg", ".png",".webp")):
             img_path = os.path.join(dirpath, filename)
             print(f"Processing {img_path}...")  # Debug print
             
@@ -28,16 +36,16 @@ for dirpath, _, filenames in os.walk(root_folder):
             try:
                 with Image.open(img_path) as img:
                     if img.size[0] < 900:
-                        # If image width is less than 700px, just copy it
+                        # If image width is less than 900px, just copy it
                         shutil.copy(img_path, optimized_path)
-                        print(f"Copied {filename} as it's already under 700px wide.")
+                        print(f"Copied {filename} as it's already under 900px wide.")
                     else:
                         # Calculate the new height to maintain aspect ratio
                         width_percent = 900 / float(img.size[0])
                         new_height = int((float(img.size[1]) * width_percent))
                         
                         # Resize and optimize the image
-                        img = img.resize((700, new_height), Image.LANCZOS)
+                        img = img.resize((900, new_height), Image.LANCZOS)
                         
                         # Save the image in the "optimized" folder within the current subfolder
                         img.save(optimized_path, optimize=True, quality=85)
